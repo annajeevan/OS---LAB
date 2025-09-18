@@ -1,0 +1,21 @@
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <string.h>
+int main(){
+    int fd = open("sysfile.txt", O_CREAT|O_WRONLY|O_TRUNC, 0644);
+    if (fd<0){ perror("open"); return 1; }
+    char *s="Hello syscalls\n";
+    write(fd, s, strlen(s));
+    lseek(fd, 0, SEEK_SET);
+    close(fd);
+
+    fd = open("sysfile.txt", O_RDONLY);
+    char buf[100]; int r = read(fd, buf, sizeof(buf)-1);
+    if (r>0){ buf[r]=0; printf("Read: %s", buf); }
+    close(fd);
+    struct stat st; stat("sysfile.txt",&st);
+    printf("Size: %lld\n", (long long)st.st_size);
+    return 0;
+}
